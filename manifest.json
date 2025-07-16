@@ -1,0 +1,15 @@
+{
+  "name": "Location Game",
+  "short_name": "LocGame",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#28a745",
+  "icons": [
+    {
+      "src": "https://iili.io/FWysYHx.md.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
