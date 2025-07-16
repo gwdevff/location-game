@@ -114,5 +114,30 @@
       });
     }
   </script>
+  let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault(); // Prevent the automatic prompt
+  deferredPrompt = e;
+  console.log('✅ A2HS ready');
+
+  // Show your own custom install button
+  const installBtn = document.createElement('button');
+  installBtn.textContent = "Install Location Game";
+  installBtn.style.cssText = "margin-top:20px;padding:10px 20px;font-size:16px;";
+  document.body.appendChild(installBtn);
+
+  installBtn.addEventListener('click', () => {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('User accepted the A2HS prompt');
+      } else {
+        console.log('User dismissed the A2HS prompt');
+      }
+      deferredPrompt = null;
+    });
+  });
+});
 </body>
 </html>
